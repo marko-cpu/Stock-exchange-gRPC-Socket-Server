@@ -10,4 +10,9 @@ This Java program simulates the operation of a stock exchange. It uses RPC and s
 - **Portfolio Management:** Effortlessly view and control your stock portfolio within the platform.
 - **Order Placement:** Easily execute buy or sell orders for a curated selection of stocks.
 - **Comprehensive Data Retrieval:** Stay informed with real-time updates on stock data.
+
+## Technologies Used
+
+- **Java (JDK)**
+- **Maven**
    

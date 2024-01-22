@@ -1,0 +1,2 @@
+protoc --plugin=protoc-gen-grpc-java=/home/marko/Desktop/protoc-gen-grpc-java-1.54.0-linux-x86_64.exe --java_out=src\main\java --grpc-java_out=src\main\java --proto_path=src\main\resources stockExchange.proto
+

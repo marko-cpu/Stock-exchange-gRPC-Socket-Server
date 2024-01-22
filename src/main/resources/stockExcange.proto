@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "rs.raf.pds.v5.z2.gRPC";
+
+service StockExchangeService {
+
+}
+
+
+
+
+

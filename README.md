@@ -1,6 +1,6 @@
 # Stock Exchange Simulation
 
-This Java program simulates the operation of a stock exchange. It uses RPC and socket servers for distributing stock market data.
+This Java program simulates the operation of a stock exchange. It uses gRPC and socket servers for distributing stock market data.
 
 
 ## Features

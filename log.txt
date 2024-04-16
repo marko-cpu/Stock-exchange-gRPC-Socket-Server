@@ -1,0 +1,13 @@
+[16/04/2024 15:35:07] Symbol: AMZN, Price: 600.00, Quantity: 1, Buyer: b2fdab84-4eab-48ca-8bbc-04647038a9b6, Seller: b85b9619-1951-405d-8c25-dea84fabd980
+[16/04/2024 15:36:30] Symbol: AMZN, Price: 800.00, Quantity: 1, Buyer: b2fdab84-4eab-48ca-8bbc-04647038a9b6, Seller: b85b9619-1951-405d-8c25-dea84fabd980
+[16/04/2024 15:38:24] Symbol: AMZN, Price: 300.00, Quantity: 2, Buyer: b2fdab84-4eab-48ca-8bbc-04647038a9b6, Seller: 1a264810-6bcf-4a92-a447-ccb1d10e1609
+[16/04/2024 15:44:31] Symbol: AMZN, Price: 300.00, Quantity: 2, Buyer: b2fdab84-4eab-48ca-8bbc-04647038a9b6, Seller: 1a264810-6bcf-4a92-a447-ccb1d10e1609
+[16/04/2024 15:45:48] Symbol: AMZN, Price: 300.00, Quantity: 3, Buyer: b2fdab84-4eab-48ca-8bbc-04647038a9b6, Seller: 1a264810-6bcf-4a92-a447-ccb1d10e1609
+[16/04/2024 15:48:23] Symbol: AMZN, Price: 800.00, Quantity: 1, Buyer: 9b0a1a92-dce8-4a18-89a6-03bf2f1ce5e7, Seller: ce74914d-8e80-4739-a279-11ffce012398
+[16/04/2024 16:01:55] Symbol: AMZN, Price: 800.00, Quantity: 3, Buyer: adba49af-2490-4fb7-9cdf-21c00a7813da, Seller: dbccf545-8e4b-41fa-95f4-d6707314093f
+[16/04/2024 16:26:53] Symbol: AMZN, Price: 600.00, Quantity: 1, Buyer: b269ba1b-628b-41ab-94c3-fd39efd8bd7c, Seller: 9e8f7a9c-7dda-4b2d-93ea-b2a03c2e200b
+[16/04/2024 16:27:18] Symbol: AMZN, Price: 600.00, Quantity: 2, Buyer: b269ba1b-628b-41ab-94c3-fd39efd8bd7c, Seller: 9e8f7a9c-7dda-4b2d-93ea-b2a03c2e200b
+[16/04/2024 16:35:20] Symbol: AMZN, Price: 600.00, Quantity: 1, Buyer: eb35fe1b-a313-4254-83c0-4ee3b3c58d18, Seller: 6f741345-0996-45bb-8f84-96a42b303f76
+[16/04/2024 16:39:15] Symbol: AMZN, Price: 600.00, Quantity: 1, Buyer: c3fd720f-7728-4230-aa94-8e2c190c8262, Seller: 0db4001b-03e0-41ec-bd6a-c8bddea8ff13
+[16/04/2024 16:41:50] Symbol: AMZN, Price: 600.00, Quantity: 1, Buyer: 025ab71e-9924-4a93-ad3f-0d24190b2233, Seller: 78444be7-d254-4fe1-b59f-de009c3e035e
+[16/04/2024 16:43:07] Symbol: AMZN, Price: 600.00, Quantity: 2, Buyer: 025ab71e-9924-4a93-ad3f-0d24190b2233, Seller: 78444be7-d254-4fe1-b59f-de009c3e035e

@@ -16,7 +16,7 @@ This application allows the user to perform certain actions via the command line
 
 - **GET STOCK**: Retrieve stock data.
 - **BUY {symbol} {price} {quantity}**: Purchase a specified quantity of stocks.
-- **SELL {symbol} {price} {quantity} **: Sell a specified quantity of stocks.
+- **SELL {symbol} {price} {quantity}**: Sell a specified quantity of stocks.
 - **HISTORY {date} {hour}**:  View stock prices at a specific date and time.
 - **PORTFOLIO**: View user portfolio.
 - **BALANCE**: Display current balance.

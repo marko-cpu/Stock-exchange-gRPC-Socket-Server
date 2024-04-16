@@ -23,6 +23,7 @@ This application allows the user to perform certain actions via the command line
 - **GET ASK {symbol} {number_offer}**: Retrieve a list of ask offers for a specific stock sorted by price.
 - **GET BID {symbol} {number_offer}**: Retrieve a list of bids for a specific stock sorted by price.
 
+
 ## Technologies Used
 
 - **Java (JDK)**

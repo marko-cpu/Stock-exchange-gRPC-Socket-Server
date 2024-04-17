@@ -47,7 +47,7 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
     private Map<String, Integer> userPortfolio;
     private Map<Socket, Set<String>> clientStockSelections = new HashMap<>();
 
-    private static final long INTERVAL_DURATION = 200000; // NA 20s
+    private static final long INTERVAL_DURATION = 20000;
     private static long lastUpdateTimestamp = 0L;
     private int currentHour = 1;
     LocalDateTime currentDate = LocalDateTime.now();
@@ -84,7 +84,7 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
         Server server = ServerBuilder.forPort(8080).addService(stockExchangeServer).build();
         server.start();
 
-        System.out.println("Stock Exchange gRPC Server started on port 8080");
+        System.out.println("\u001B[1mBuyStock Exchange gRPC Server started on port 8080\u001B[0m");
         new Thread(stockExchangeServer::startSocketServer).start();
 
         server.awaitTermination();
@@ -92,10 +92,10 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
 
     private void startSocketServer() {
         try (ServerSocket serverSocket = new ServerSocket(6666)) {
-            System.out.println("Socket server started on port 6666");
+            System.out.println("\u001B[1mSocket server started on port 6666\u001B[0m");
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("New client connected: " + clientSocket.getInetAddress());
+                System.out.println("\u001B[1mNew client connected:\u001B[0m " + clientSocket.getInetAddress());
                 new Thread(() -> handleSocketClient(clientSocket)).start();
                 sendTcpStockUpdates();
             }
@@ -106,7 +106,7 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
 
 
     private void Updates() {
-        System.out.println("update..");
+        System.out.println("\u001B[1mUpdates of stock prices\u001B[0m");
 
         synchronized (stockDataList) {
             if (stockDataList.size() != historyStockDataList.size()) {
@@ -163,11 +163,11 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
         String RED = "\u001B[31m";
         String stockUpdate;
         String change = String.format("%.2f",priceChange);
-        String np = String.format("%.2f",newPrice);
+        String new_price = String.format("%.2f",newPrice);
         if (priceChange > 0)
-            stockUpdate = symbol + " " + np + " " + GREEN + "↑+" + change + RESET;
+            stockUpdate = symbol + " " + new_price + " " + GREEN + "↑+" + change + RESET;
         else
-            stockUpdate = symbol + " " + np + " " + RED + "↓" + change + RESET;
+            stockUpdate = symbol + " " + new_price + " " + RED + "↓" + change + RESET;
 
         for (Map.Entry<Socket, Set<String>> entry : clientStockSelections.entrySet()) {
             Socket clientSocket = entry.getKey();
@@ -185,21 +185,19 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
         }
     }
 
-
     private void saveTradesToFile(List<Trade> trades) {
         String fileName = "log.txt";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        LocalDateTime currentDateTime = LocalDateTime.now();
 
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), StandardOpenOption.APPEND)) {
             for (Trade trade : trades) {
-                String timestamp = LocalDateTime.now().format(formatter);
+                String timestamp = currentDateTime.format(formatter);
                 String logEntry = String.format("[%s] Symbol: %s, Price: %.2f, Quantity: %d, Buyer: %s, Seller: %s",
                         timestamp, trade.getSymbol(), trade.getPrice(), trade.getQuantity(),
-                        trade.getBuyerClientId(),trade.getSellerClientId());
+                        trade.getBuyerClientId(), trade.getSellerClientId());
 
                 logEntry += System.lineSeparator();
-
-
                 writer.write(logEntry);
             }
         } catch (IOException e) {
@@ -207,23 +205,25 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
         }
     }
 
-
     private void notifyClientsInTrade(Trade trade) {
         String buyerClientId = trade.getBuyerClientId();
         String sellerClientId = trade.getSellerClientId();
-        String buyerNotification = String.format("Your buy order for %d shares of %s at $%.2f was successful.",
-                trade.getQuantity(), trade.getSymbol(), trade.getPrice());
-        String sellerNotification = String.format("Your sell order for %d shares of %s at $%.2f was successful.",
-                trade.getQuantity(), trade.getSymbol(), trade.getPrice());
+        int quantity = trade.getQuantity();
+        String symbol = trade.getSymbol();
+        double price = trade.getPrice();
+
+        String buyerNotification = String.format("\u001B[1mYour buy order for %d shares of %s at $%.2f was successful.\u001B[0m",
+                quantity, symbol, price);
+        String sellerNotification = String.format("\u001B[1mYour sell order for %d shares of %s at $%.2f was successful.\u001B[0m",
+                quantity, symbol, price);
 
         notifyClient(buyerClientId, buyerNotification);
         notifyClient(sellerClientId, sellerNotification);
     }
 
+
     private void handleTrade(Trade trade) {
         tradeList.add(trade);
-        //updateUserPortfolio(trade.getBuyerClientId(), trade.getSymbol(), trade.getQuantity(), true);
-       // updateUserPortfolio(trade.getSellerClientId(), trade.getSymbol(), trade.getQuantity(), false);
         notifyClientsInTrade(trade);
         saveTradesToFile(Collections.singletonList(trade));
     }
@@ -322,8 +322,8 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
             for (StockData stock_d : stockDataList) {
                 symbols += stock_d.getSymbol() + "~";
             }
+            writer.println("\u001B[1mEnter the symbols\u001B[0m:~" + symbols + "\u001B[0m");
 
-            writer.println("Enter the symbols:~" + symbols);
             //String selectedStocks = reader.readLine();
             List<String> selected = new ArrayList<>();
             List<String> validSymbols = Arrays.asList(symbols.split("~"));
@@ -338,8 +338,9 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
                     if (validSymbols.contains(trimmedSymbol)) {
                         selected.add(trimmedSymbol); // Ispravni simboli
                     } else {
-                        writer.println("Invalid symbol: " + "[ " + trimmedSymbol + " ]" + ". Please try again.");
-                        allSymbolsValid = false;
+                            writer.println("\u001B[31mInvalid symbol: " + "[ " + trimmedSymbol + " ]" + ". Please try again." + "\u001B[0m");
+                            allSymbolsValid = false;
+
                     }
                 }
                 if (allSymbolsValid) {
@@ -349,7 +350,7 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
 
             clientStockSelections.put(clientSocket, new HashSet<>(selected));
 
-            writer.println("You are now tracking: " + selectedStocks);
+            writer.println("\u001B[32;1mYou are now tracking: " + "[ " + selectedStocks + " ]" + "\u001B[0m");
 
             while (true) {
                 if (clientSocket.isClosed()) {
@@ -487,7 +488,7 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
 
                         try {
                             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
-                            StringBuilder updateMessage = new StringBuilder("Periodical update:~");
+                            StringBuilder updateMessage = new StringBuilder("\u001B[1mPeriodical update you selected stocks\u001B[0m:~");
 
                             for (StockData stockData : stockDataList) {
                                 if (selectedStocks.contains(stockData.getSymbol())) {
@@ -509,13 +510,12 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
                                         updatedPriceChange = stockData.getPriceChange();
                                     }
 
-
                                     String color = updatedPriceChange > 0 ? GREEN + "↑+" : RED + "↓";
                                     String RESET = "\u001B[0m";
                                     String dataString =  "[ " +stockData.getSymbol() + " ]" + " " + stockData.getCompanyName() + " " +
                                             " " + stockData.getCurrentPrice() + " " +
                                             color + String.format("%.2f", updatedPriceChange) + RESET +
-                                            " " + stockData.getDate() + " " + stockData.getHour() + "h";
+                                            " " + "[ " + stockData.getDate() + " " + stockData.getHour() + "h" + " ]";
 
                                     updateMessage.append(dataString).append("~");
                                 }
@@ -534,27 +534,32 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
     @Override
     public void getClientPortfolio(ClientPortfolioRequest request, StreamObserver<ClientPortfolio> responseObserver) {
         String clientId = request.getClientId();
-        List<ClientStock> portfolioItems = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : userPortfolio.entrySet()) {
-            String entryClientId = entry.getKey().substring(0, clientId.length());
+        if (clientId == null) {
+            responseObserver.onError(new IllegalArgumentException("Client ID cannot be null"));
+            return;
+        }
 
-            if (entryClientId.equals(clientId)) {   
-                String symbol = entry.getKey().substring(clientId.length());
-                int quantity = entry.getValue();
+        List<ClientStock> portfolioItems = new ArrayList<>();
+        userPortfolio.forEach((key, value) -> {
+            if (key.startsWith(clientId)) {
+                String symbol = key.substring(clientId.length());
                 ClientStock clientStock = ClientStock.newBuilder()
                         .setSymbol(symbol)
-                        .setQuantity(quantity)
+                        .setQuantity(value)
                         .build();
                 portfolioItems.add(clientStock);
             }
-        }
+        });
+
         ClientPortfolio portfolio = ClientPortfolio.newBuilder()
                 .setClientId(clientId)
                 .addAllStocks(portfolioItems)
                 .build();
+
         responseObserver.onNext(portfolio);
         responseObserver.onCompleted();
     }
+
 
     private void updateUserPortfolio(String clientId, String symbol, int quantity, boolean isBuyOrder) {
 
@@ -585,22 +590,27 @@ public class StockExchangeServer extends StockExchangeServiceGrpc.StockExchangeS
 
     @Override
     public void getStockData(Empty request, StreamObserver<StockDataList> responseObserver) {
+        if (stockDataList == null) {
+            responseObserver.onError(new IllegalStateException("Stock data list is null"));
+            return;
+        }
+
         StockDataList.Builder stockDataListBuilder = StockDataList.newBuilder();
 
-        for (StockData stockData : stockDataList) {
-
-            double updatedPriceChange;
-            updatedPriceChange = stockData.getPriceChange();
+        stockDataList.forEach(stockData -> {
+            double updatedPriceChange = stockData.getPriceChange();
 
             StockData updatedStockData = stockData.toBuilder()
                     .setPriceChange(updatedPriceChange)
                     .build();
 
             stockDataListBuilder.addStocks(updatedStockData);
-        }
+        });
+
         responseObserver.onNext(stockDataListBuilder.build());
         responseObserver.onCompleted();
     }
+
 
     @Override
     public void getStockDataByDateTime(StockDataByDateTimeRequest request, StreamObserver<StockDataList> responseObserver) {

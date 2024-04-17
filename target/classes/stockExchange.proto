@@ -85,7 +85,6 @@ message StockDataByDateTimeRequest {
 }
 message Empty {}
 
-
 message AskData {
   string symbol = 1;
   double askPrice = 2;

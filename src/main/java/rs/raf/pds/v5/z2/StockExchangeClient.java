@@ -102,7 +102,7 @@ public class StockExchangeClient {
                     }
                 }
                 else {
-                    System.out.println("That command does not exist.");
+                    System.out.println("\u001B[31mThat command does not exist.\u001B[0m");
                 }
             }
         });
@@ -136,7 +136,6 @@ public class StockExchangeClient {
         return UUID.randomUUID().toString();
     }
 
-
     public ClientPortfolio getClientPortfolio(ClientPortfolioRequest request)
     {
         return blockingStub.getClientPortfolio(request);
@@ -149,22 +148,22 @@ public class StockExchangeClient {
 
         ClientPortfolio portfolio = getClientPortfolio(request);
 
-        System.out.println("Portfolio - Client ID " + portfolio.getClientId() + ":");
+        System.out.println("Portfolio - Client ID " + "\u001B[31;1m" + portfolio.getClientId() + "\u001B[0m" + ":");
         for (ClientStock item : portfolio.getStocksList()) {
-            System.out.println("Symbol: " + item.getSymbol() + ", Quantity: " + item.getQuantity());
+            System.out.println("\u001B[1mSymbol:\u001B[0m " + item.getSymbol() + ", \u001B[1mQuantity:\u001B[0m " + item.getQuantity());
         }
     }
 
     private void receiveUpdates() throws InterruptedException {
-        System.out.println("TCP thread is running.");
+        System.out.println("\u001B[32mTCP thread is running.\u001B[0m");
         while (true) {
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
                 PrintWriter writer = new PrintWriter(tcpSocket.getOutputStream(), true);
                 String tcpMessage = reader.readLine();
                 if (tcpMessage != null) {
-                    if(tcpMessage.startsWith("Enter the symbols")) {
-                        System.out.println(tcpMessage.replace("~", " | "));
+                    if(tcpMessage.startsWith("\u001B[1mEnter the symbols\u001B[0m")) {
+                        System.out.println(tcpMessage.replace("~", " \u001B[1m|\u001B[0m "));
                         String selectedSymbols;
                         String response;
                         boolean isValidInput = false;
@@ -173,7 +172,7 @@ public class StockExchangeClient {
                             writer.println(selectedSymbols);
                             response = reader.readLine();
                             System.out.println(response);
-                            if (!response.startsWith("You are now tracking")) {
+                            if (!response.startsWith("\u001B[32;1mYou are now tracking: ")) {
                                 System.out.println("Enter again:");
                             } else {
                                 isValidInput = true;
@@ -183,9 +182,11 @@ public class StockExchangeClient {
                             phase = true;
                         }
                     }
-                    else if(tcpMessage.startsWith("Periodical update")) {
+                    else if(tcpMessage.startsWith("\u001B[1mPeriodical update you selected stocks\u001B[0m")) {
                         tcpMessage = tcpMessage.replace("~", "\n");
-                        System.out.println(tcpMessage);
+                        System.out.print(tcpMessage);
+                        System.out.println("\u001B[36;1m---------------------------------------------------\u001B[0m");
+
                     }
                     else if (tcpMessage.startsWith("User")) {
                         System.out.println("Received trade notification: \n" + tcpMessage);
@@ -220,15 +221,9 @@ public class StockExchangeClient {
                 " " + stockData.getCurrentPrice() + " " + color + String.format("%.2f", stockData.getPriceChange()) + RESET + " " + "[ " + stockData.getDate() + " " + stockData.getHour() + "h" + " ]";
         int maxLength = 55;
         dataString = String.format("%-" + maxLength + "s", dataString);
-
-
         System.out.println(dataString);
-        System.out.println("------------------------------------------------------------");
-
-
+        System.out.println("\u001B[36;1m------------------------------------------------------------\u001B[0m");
     }
-
-
 
     private void getStockData() throws InterruptedException{
 
@@ -258,13 +253,24 @@ public class StockExchangeClient {
         }
     }
 
-
-
     private void submitBuy(String symbol, double price, int quantity) {
-        double totalCost = price * quantity; // Izračunaj ukupnu cijenu
-
+        double totalCost = price * quantity; // calculate total sum
         if (totalCost > balance) {
-            System.out.println("Order failure: Your balance is $" + balance + ", and the total cost for this order is $" + totalCost);
+            System.out.println("\u001B[31mOrder failure:\u001B[0m: Your balance is $" + balance + ", and the total cost for this order is $" + totalCost);
+            return;
+        }
+        Empty requestt = Empty.newBuilder().build();
+        StockDataList stockDataList = blockingStub.getStockData(requestt);
+        boolean symbolExists = false;
+        for (StockData stock : stockDataList.getStocksList()) {
+            if (stock.getSymbol().equals(symbol)) {
+                symbolExists = true;
+                break;
+            }
+        }
+
+        if (!symbolExists) {
+            System.out.println("\u001B[31mOrder failure:\u001B[0m: Symbol " + symbol + " does not exist in the stock list.");
             return;
         }
 
@@ -284,21 +290,21 @@ public class StockExchangeClient {
 
         if (response.getSuccess()) {
             balance -= totalCost;
-            System.out.println("Buy order success. Remaining balance: $" + balance);
+            System.out.println("\u001B[1mBuy order success. Remaining balance: $" + balance + "\u001B[0m");
         } else {
-            System.out.println("Buy order failed.");
+            System.out.println("\u001B[1mBuy order failed.\u001B[0m");
         }
     }
 
     private void submitSell(String symbol, double price, int quantity) {
-        ClientPortfolioRequest requestcp = ClientPortfolioRequest.newBuilder()
+        ClientPortfolioRequest requestTcp = ClientPortfolioRequest.newBuilder()
                 .setClientId(currentUserId)
                 .build();
-        ClientPortfolio portfolio = getClientPortfolio(requestcp);
+        ClientPortfolio portfolio = getClientPortfolio(requestTcp);
         for (ClientStock item : portfolio.getStocksList()) {
             if (item.getSymbol().equalsIgnoreCase(symbol.trim())) {
                 if (item.getQuantity() >= quantity) {
-                    double totalSaleAmount = price * quantity; // Ukupan iznos prodaje
+                    double totalSaleAmount = price * quantity; // calculate total sum amount
                     OrderData orderData = OrderData.newBuilder()
                             .setSymbol(symbol)
                             .setPrice(price)
@@ -314,20 +320,19 @@ public class StockExchangeClient {
                     OrderResponse response = blockingStub.submitOrder(request);
 
                     if (response.getSuccess()) {
-
                         balance += totalSaleAmount;
-                        System.out.println("Sell order success. New balance: $" + balance);
+                        System.out.println("\u001B[1mSell order success. New balance: $" + balance + "\u001B[0m");
                     } else {
-                        System.out.println("Sell order failed.");
+                        System.out.println("\u001B[31mSell order failed.\u001B[0m");
                     }
                     return;
                 } else {
-                    System.out.println("Order failure: Your quantity of " + symbol + " in your portfolio is " + item.getQuantity() + ", which is less than you wanted to sell (" + quantity + ")");
+                    System.out.println("\u001B[31mOrder failure:\u001B[0m" + " Your quantity of " + symbol + " in your portfolio is " + item.getQuantity() + ", which is less than you wanted to sell (" + quantity + ")");
                     return;
                 }
             }
         }
-        System.out.println("Order failure: You do not possess any " + symbol + " stocks");
+        System.out.println("\u001B[31mOrder failure:\u001B[0m" + " You do not possess any " + symbol + " stocks");
     }
 
     private void getAskList(String symbol, int numOffers) {
@@ -355,7 +360,7 @@ public class StockExchangeClient {
             int totalAvailableShares = groupedAsks.stream().mapToInt(AskData::getAvailableShares).sum();
 
             System.out.println("Symbol: " + symbol + " Ask Price: " + askPrice + " Available Shares: " + totalAvailableShares);
-            System.out.println("-----------------------------------------------------");
+            System.out.println("\u001B[36;1m-----------------------------------------------------\u001B[0m");
         }
     }
 
@@ -384,12 +389,9 @@ public class StockExchangeClient {
             int totalRequestedShares = groupedBids.stream().mapToInt(BidData::getRequestedShares).sum();
 
             System.out.println("Symbol: " + symbol + " Bid Price: " + bidPrice + " Requested Shares: " + totalRequestedShares);
-            System.out.println("------------------------------");
+            System.out.println("\u001B[36;1m-----------------------------------\u001B[0m");
         }
     }
-
-
-
 
 }
 

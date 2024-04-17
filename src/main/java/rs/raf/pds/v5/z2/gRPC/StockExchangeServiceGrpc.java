@@ -6,7 +6,7 @@ import static io.grpc.MethodDescriptor.generateFullMethodName;
  */
 @javax.annotation.Generated(
     value = "by gRPC proto compiler (version 1.54.0)",
-    comments = "Source: stockExcange.proto")
+    comments = "Source: stockExchange.proto")
 @io.grpc.stub.annotations.GrpcGenerated
 public final class StockExchangeServiceGrpc {
 
@@ -821,7 +821,7 @@ public final class StockExchangeServiceGrpc {
 
     @java.lang.Override
     public com.google.protobuf.Descriptors.FileDescriptor getFileDescriptor() {
-      return rs.raf.pds.v5.z2.gRPC.StockExcange.getDescriptor();
+      return rs.raf.pds.v5.z2.gRPC.StockExchange.getDescriptor();
     }
 
     @java.lang.Override

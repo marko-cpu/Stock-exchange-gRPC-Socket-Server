@@ -1,4 +1,4 @@
-<div align="center"># Stock Exchange Simulation</div>
+# <div align="center">Stock Exchange Simulation</div>
 
 This Java program simulates the operation of a stock exchange. It uses gRPC and socket servers for distributing stock market data.
 
